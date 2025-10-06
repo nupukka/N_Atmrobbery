@@ -1,0 +1,10 @@
+{
+    "NotificationTitle": "Pankkiautomaatin ryöstö",
+    "BreakTarget": "Murra pankkiautomaatti",
+    "HackTarget": "Häkkeröi pankkiautomaatti",
+    "ProgressText": "Otetaan rahoja...",
+    "NotEnoughPolice": "Ei tarpeeksi poliiseja!",
+    "Cooldown": "Tämä pankkiautomaatti on juuri ryöstetty!",
+    "Success": "Onnistuit murrossa",
+    "Failed": "Epäonnistuit!"
+}

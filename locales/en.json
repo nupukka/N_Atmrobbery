@@ -1,0 +1,10 @@
+{
+    "NotificationTitle": "ATM Robbery",
+    "BreakTarget": "Rob ATM",
+    "HackTarget": "Hack ATM",
+    "ProgressText": "Taking Money...",
+    "NotEnoughPolice": "Not enough cops online!",
+    "Cooldown": "This ATM has been just robbed!",
+    "Success": "Success!",
+    "Failed": "Failed!"
+}
