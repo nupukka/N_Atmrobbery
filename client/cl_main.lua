@@ -38,19 +38,6 @@ function HasItem()
     return false
 end
 
-local function CheckPlayerDistance(atmCoords)
-    local playerPed = PlayerPedId()
-    local playerCoords = GetEntityCoords(playerPed)
-    local distance = #(playerCoords - atmCoords)
-
-    if distance > N.Options.MoveDistance then
-        local playerServerId = GetPlayerServerId(PlayerId())
-        print(("Player ID %s was too far away from ATM robbery possible cheater!"):format(playerServerId))
-        return false
-    end
-    return true
-end
-
 for _, model in pairs(AtmModels) do
     exports.ox_target:addModel(model, {
         {
@@ -77,11 +64,10 @@ for _, model in pairs(AtmModels) do
                 if success then
                     PoliceAlert() 
                     if Progressbar('anim@heists@ornate_bank@grab_cash', 'grab', `p_ld_heist_bag_s`, 40269, vec3(0.0454, 0.2131, -0.1887), vec3(66.4762, 7.2424, -71.9051)) then
-                        if not CheckPlayerDistance(atmCoords) then
-                            return
+                        local rewardSuccess = lib.callback.await('n_AtmRobbery_giveReward', false, atmCoords)
+                        if rewardSuccess then
+                            Notify(locale("Success"))
                         end
-                        lib.callback.await('n_AtmRobbery_giveReward', false, atmCoords)
-                    Notify(locale("Success"))
                     end
                 else
                     PoliceAlert()
@@ -113,11 +99,10 @@ for _, model in pairs(AtmModels) do
                 if success then
                     PoliceAlert()
                     if Progressbar('anim@heists@ornate_bank@grab_cash', 'grab', `p_ld_heist_bag_s`, 40269, vec3(0.0454, 0.2131, -0.1887), vec3(66.4762, 7.2424, -71.9051)) then
-                        if not CheckPlayerDistance(atmCoords) then
-                            return
+                        local rewardSuccess = lib.callback.await('n_AtmRobbery_giveReward', false, atmCoords)
+                        if rewardSuccess then
+                            Notify(locale("Success"))
                         end
-                        lib.callback.await('n_AtmRobbery_giveReward', false, atmCoords)
-                    Notify(locale("Success"))
                     end
                 else
                     PoliceAlert()
