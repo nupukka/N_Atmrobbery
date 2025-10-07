@@ -1,4 +1,5 @@
 local N = require("config")
+local Webhook = "WEBHOOK HERE"
 
 if N.Core.Framework == "ESX" then
     if N.Core.UseNewESX then
@@ -24,11 +25,31 @@ local function GetAtmKey(coords)
     return string.format("%.3f,%.3f,%.3f", coords.x, coords.y, coords.z)
 end
 
-local function CheckPlayerDistance(source, coords)
+local function SendWebhook(message, description)
+    if Webhook and Webhook ~= "" then
+        local embed = {
+            {
+                ["title"] = "N_Atmrobbery",
+                ["description"] = description,
+                ["color"] = 0x00FF00,
+                ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ"),
+                ["footer"] = {
+                    ["text"] = "N_AtmRobbery"
+                }
+            }
+        }
+        PerformHttpRequest(Webhook, function(err, text, headers) end, 'POST', json.encode({embeds = embed}), { ['Content-Type'] = 'application/json' })
+    end
+end
+
+local function CheckDistance(source, coords)
     local playerPed = GetPlayerPed(source)
     local playerCoords = GetEntityCoords(playerPed)
     local distance = #(playerCoords - coords)
-    if distance > N.Options.Distance then
+    if distance > N.Options.MoveDistance then
+        local playerName = GetPlayerName(source)
+        local description = string.format("Player %s ID: %s were too far from ATM while robbing it (Possible cheater!) %s", playerName, source, tostring(coords))
+        SendWebhook("", description)
         return false
     end
     return true
@@ -87,15 +108,15 @@ end)
 lib.callback.register('n_AtmRobbery_giveReward', function(source, coords)
     local key = GetAtmKey(coords)
     if Cooldowns[key] and os.time() < Cooldowns[key] then
-        return 
+        return false
+    end
+
+    if not CheckDistance(source, coords) then
+        return false
     end
 
     local Player
     local reward = N.Options.RewardCount
-
-    if not CheckPlayerDistance(source, coords) then
-        return  
-    end
 
     if N.Core.Inventory == "OX" then
         exports.ox_inventory:AddItem(source, N.Options.RewardItem, reward)
@@ -110,6 +131,10 @@ lib.callback.register('n_AtmRobbery_giveReward', function(source, coords)
             Player.Functions.AddMoney('cash', reward)
         end
     end
+
+    local playerName = GetPlayerName(source)
+    local description = string.format("Player %s ID: %s robbed an ATM and got %d money in coords %s", playerName, source, reward, tostring(coords))
+    SendWebhook("", description)
 
     Cooldowns[key] = os.time() + (N.Options.Cooldown * 60)
     return true
