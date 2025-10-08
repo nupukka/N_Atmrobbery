@@ -20,24 +20,6 @@ elseif N.Core.Framework == "QBX" then
     QBCore = exports["qbx-core"]:GetCoreObject()
 end
 
-function HasItem()
-    local item = N.Options.HackNeededItem
-    if N.Core.Inventory == "OX" then
-        return exports.ox_inventory:Search('count', item) > 0
-    elseif N.Core.Inventory == "ESX" then
-        local xPlayer = ESX.GetPlayerData()
-        for _, v in pairs(xPlayer.inventory) do
-            if v.name == item and v.count > 0 then
-                return true
-            end
-        end
-        return false
-    elseif N.Core.Inventory == "QB" then
-        return QBCore.Functions.HasItem(item, 1)
-    end
-    return false
-end
-
 for _, model in pairs(AtmModels) do
     exports.ox_target:addModel(model, {
         {
@@ -80,9 +62,7 @@ for _, model in pairs(AtmModels) do
             icon = 'fas fa-laptop',
             label = locale("HackTarget"),
             distance = N.Options.Distance,
-            canInteract = function()
-                return HasItem()
-            end,
+            items = N.Options.HackNeededItem,
             onSelect = function(data)
                 local atmCoords = GetEntityCoords(data.entity)
                 local hasEnoughPolice = lib.callback.await('n_AtmRobbery_checkPolice', false)
