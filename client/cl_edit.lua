@@ -40,9 +40,11 @@ function Progressbar(dict, clip, model, bone, pos, rot)
             label = locale("ProgressText"),
             position = 'bottom',
             useWhileDead = false,
-            canCancel = true,
+            canCancel = false,
             disable = {
                 car = true,
+                move = true,
+                combat = true,
             },
             anim = {
                 dict = dict,
@@ -60,9 +62,11 @@ function Progressbar(dict, clip, model, bone, pos, rot)
             duration = 10000,
             label = locale("ProgressText"),
             useWhileDead = false,
-            canCancel = true,
+            canCancel = false,
             disable = {
                 car = true,
+                move = true,
+                combat = true,
             },
             anim = {
                 dict = dict,
@@ -80,24 +84,60 @@ function Progressbar(dict, clip, model, bone, pos, rot)
 end
 
 function BreakMinigame()
-    if N.Options.BreakMinigame == "OX" then 
-        return lib.skillCheck({'easy', 'easy', 'easy', 'easy', {areaSize = 60, speedMultiplier = 2}}, {'1', '2', '3', '4'})
-    elseif N.Options.BreakMinigame == "BL" then
-        return exports.bl_ui:Progress(5, 70)
+    local playerPed = PlayerPedId()
+    local dict = 'melee@large_wpn@streamed_core'
+    local clip = 'ground_attack_0'
+
+    RequestAnimDict(dict)
+    while not HasAnimDictLoaded(dict) do
+        Wait(100)
     end
-    return false
+
+    TaskPlayAnim(playerPed, dict, clip, 8.0, -8.0, -1, 1, 0, false, false, false)
+
+    local success
+    if N.Options.BreakMinigame == "OX" then 
+        success = lib.skillCheck({'easy', 'easy', 'easy', 'easy', {areaSize = 60, speedMultiplier = 2}}, {'1', '2', '3', '4'})
+    elseif N.Options.BreakMinigame == "BL" then
+        success = exports.bl_ui:Progress(5, 70)
+    else
+        success = false
+    end
+
+    ClearPedTasksImmediately(playerPed)
+    RemoveAnimDict(dict)
+
+    return success
 end
 
 function HackMinigame()
+    local playerPed = PlayerPedId()
+    local dict = 'anim@heists@prison_heiststation@cop_reactions'
+    local clip = 'cop_b_idle'
+
+    RequestAnimDict(dict)
+    while not HasAnimDictLoaded(dict) do
+        Wait(100)
+    end
+
+    TaskPlayAnim(playerPed, dict, clip, 8.0, -8.0, -1, 1, 0, false, false, false)
+
+    local success
     if N.Options.HackMinigame == "BL" then
-        return exports.bl_ui:MineSweeper(3, {
+        success = exports.bl_ui:MineSweeper(3, {
             grid = 4, 
             duration = 10000, 
             target = 4,
             previewDuration = 2000 
         })
+    else
+        success = false
     end
-    return false
+
+    ClearPedTasksImmediately(playerPed)
+    RemoveAnimDict(dict)
+
+    return success
 end
 
 function PoliceAlert()
